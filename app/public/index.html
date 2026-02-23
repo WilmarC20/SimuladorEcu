@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="es" translate="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google" content="notranslate">
+  <title>Emulador OBD2 & GPS NEO — Raspberry Pi</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23161922'/><text x='16' y='22' text-anchor='middle' fill='%2300d4aa' font-size='18' font-family='sans-serif'>O</text></svg>" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css?v=2.1.0">
+</head>
+<body>
+  <!-- Sprite de iconos SVG (referencia: use href="#icon-nombre") -->
+  <div aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden;clip:rect(0,0,0,0);">
+    <svg xmlns="http://www.w3.org/2000/svg"><defs>
+      <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></symbol>
+      <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+      <symbol id="icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+      <symbol id="icon-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></symbol>
+      <symbol id="icon-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 9l-1.3-4.4c-.3-1-.1-2 .5-2.8.6-.8 1.5-1.2 2.5-1.2h3c.6 0 1 .4 1 1v12c0 .6-.4 1-1 1h-2"/><path d="M5 17H3c-.6 0-1-.4-1-1v-3c0-.9.7-1.7 1.5-1.9L6 9l1.3-4.4c.3-1 .1-2-.5-2.8C6.2 1 5.3.6 4.3.6h-3c-.6 0-1 .4-1 1v12c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></symbol>
+      <symbol id="icon-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></symbol>
+      <symbol id="icon-route" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 6h4l3 6-3 6H9"/></symbol>
+      <symbol id="icon-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></symbol>
+      <symbol id="icon-external" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></symbol>
+      <symbol id="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></symbol>
+      <symbol id="icon-stop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="1"/></symbol>
+      <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+      <symbol id="icon-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></symbol>
+      <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></symbol>
+      <symbol id="icon-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></symbol>
+      <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+      <symbol id="icon-flag-start" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></symbol>
+      <symbol id="icon-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+      <symbol id="icon-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+      <symbol id="icon-bluetooth" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 12 5-5 5 5-5 5-5-5z"/><path d="M12 5v14"/><path d="m17 7 4 5-4 5"/><path d="m7 7-4 5 4 5"/></symbol>
+      <symbol id="icon-wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.4a6 6 0 0 1 7 0"/><path d="M12 20h.01"/></symbol>
+      <symbol id="icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></symbol>
+      <symbol id="icon-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M20 12a8 8 0 0 0-16 0"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+      <symbol id="icon-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+      <symbol id="icon-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></symbol>
+      <symbol id="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+      <symbol id="icon-tilt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="m6 9 6 6 6-6"/><path d="M3 12h18"/></symbol>
+      <symbol id="icon-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></symbol>
+      <symbol id="icon-clear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></symbol>
+      <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+      <symbol id="icon-folder-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path d="M2 9h20"/></symbol>
+      <symbol id="icon-unlock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></symbol>
+      <symbol id="icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+      <symbol id="icon-gps-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></symbol>
+      <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+      <symbol id="icon-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    </defs></svg>
+  </div>
+  <header class="topbar">
+    <button type="button" class="btn-hamburger" id="btn-menu" aria-label="Abrir menú">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-menu"/></svg>
+    </button>
+    <h1 class="topbar-title" id="topbar-title">OBD2 + GPS NEO</h1>
+  </header>
+  <div class="overlay" id="menu-overlay" aria-hidden="true"></div>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="logo">
+        <h1>OBD2 + GPS NEO</h1>
+        <p>Emulador en Raspberry Pi</p>
+      </div>
+      <nav class="nav">
+        <a href="#" class="active" data-page="resumen"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-home"/></svg>Resumen</a>
+        <span class="nav-sep" aria-hidden="true"></span>
+        <a href="#" data-page="sistema"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-cpu"/></svg>Sistema (Pi)</a>
+        <a href="#" data-page="hardware"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-chip"/></svg>Hardware (Pi 4)</a>
+        <span class="nav-sep" aria-hidden="true"></span>
+        <a href="#" data-page="obd2"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-car"/></svg>Emulador OBD2</a>
+        <a href="#" data-page="gps"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-map"/></svg>Emulador GPS NEO</a>
+        <span class="nav-sep" aria-hidden="true"></span>
+        <a href="#" data-page="routes"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-route"/></svg>Creador de rutas</a>
+        <a href="#" data-page="import-torque"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-download"/></svg>Importar Torque</a>
+        <span class="nav-sep" aria-hidden="true"></span>
+        <a href="#" data-page="ayuda"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-help"/></svg>Ayuda</a>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="version-badge" id="version-badge" aria-hidden="true">v2.1.0</span>
+        <button type="button" class="btn btn-ghost btn-refresh" id="btn-reload" title="Recargar página (también F5)"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-refresh"/></svg>Recargar página</button>
+      </div>
+    </aside>
+    <main>
+      <div id="page-resumen" class="page active">
+        <h2>Resumen</h2>
+        <div class="cards">
+          <div class="card">
+            <h3>Raspberry Pi</h3>
+            <div id="resumen-pi" class="card-grid">Cargando…</div>
+          </div>
+          <div class="card">
+            <h3>Emulador OBD2</h3>
+            <p id="resumen-obd" class="kv"><span class="status-dot off"></span> Emulador OBD2 en esta Pi</p>
+          </div>
+          <div class="card">
+            <h3>Emulador GPS NEO</h3>
+            <p id="resumen-gps" class="kv">Serial por pines UART: <span id="resumen-gps-status">—</span></p>
+          </div>
+        </div>
+      </div>
+      <div id="page-sistema" class="page">
+        <h2>Sistema — Raspberry Pi</h2>
+        <div class="cards">
+          <div class="card">
+            <h3>Red</h3>
+            <div id="sistema-network" class="card-grid">Cargando…</div>
+          </div>
+          <div class="card">
+            <h3>Puertos serial (UART / USB)</h3>
+            <div id="sistema-ports" class="card-grid">Cargando…</div>
+          </div>
+          <div class="card">
+            <h3>Bluetooth — hacer visible para el celular</h3>
+            <p class="kv" style="margin-bottom:0.75rem;">Elige el adaptador (p. ej. hci0 integrado o hci1 dongle) y pulsa <strong>Arrancar</strong> para encenderlo y ponerlo en modo descubrible.</p>
+            <div class="form-row">
+              <label>Adaptador BT</label>
+              <select id="bt-adapter">
+                <option value="">— Cargando… —</option>
+              </select>
+            </div>
+            <div class="toolbar">
+              <button class="btn btn-primary" id="bt-start"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-play"/></svg>Arrancar / Hacer visible</button>
+              <button class="btn btn-ghost" id="bt-stop"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-stop"/></svg>Dejar de ser visible</button>
+              <span id="bt-start-msg" class="kv" style="margin-left:0.5rem;"></span>
+            </div>
+            <p class="kv bt-help-note">Si sale <strong>error de vinculación</strong>, pulsa <button type="button" class="btn btn-ghost" id="bt-show-log" style="padding:0.2rem 0.5rem;font-size:0.85em;"><svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-list"/></svg>Ver log del agente</button>. En la Pi instala <code class="code-inline">python3-dbus</code> y <code class="code-inline">python3-gi</code> si falta.</p>
+            <pre id="bt-agent-log" class="bt-agent-log" style="display:none;"></pre>
+            <h4 class="kv" style="margin-top:1rem;margin-bottom:0.5rem;">Adaptadores en modo visible</h4>
+            <div id="bt-started-table-wrap">
+              <table class="bt-started-table" id="bt-started-table">
+                <thead>
+                  <tr><th>Adaptador</th><th>MAC</th><th>Nombre en el celular</th><th>Acción</th></tr>
+                </thead>
+                <tbody id="bt-started-tbody">
+                  <tr><td colspan="4" class="bt-started-empty">Ninguno en modo visible</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="page-obd2" class="page">
+        <h2>Emulador OBD2</h2>
+        <p class="kv page-desc">Simulador OBD2 integrado en esta Raspberry Pi. Conecta por Bluetooth o WiFi y prueba sensores, DTC y fallos simulados.</p>
+        <div class="tabs-obd2">
+          <div class="tabs-bar" role="tablist">
+            <button type="button" class="tab-btn active" role="tab" data-tab="obd2-en-vivo" aria-selected="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-gauge"/></svg>En vivo</button>
+            <button type="button" class="tab-btn" role="tab" data-tab="obd2-dispositivos"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-list"/></svg>Dispositivos</button>
+            <button type="button" class="tab-btn" role="tab" data-tab="obd2-controles"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-cpu"/></svg>Controles</button>
+            <button type="button" class="tab-btn" role="tab" data-tab="obd2-crear-perfil"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-car"/></svg>Crear perfil</button>
+            <button type="button" class="tab-btn" role="tab" data-tab="obd2-dtc"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-code"/></svg>DTC / OBD</button>
+          </div>
+          <div id="obd2-en-vivo" class="tab-panel active" role="tabpanel">
+            <div class="cards">
+              <div class="card torque-connect">
+                <h3>Conexión (Bluetooth o WiFi)</h3>
+                <p id="obd2-bt-server-status" class="kv" style="margin-bottom:0.5rem;font-size:0.9rem;">Servidor OBD Bluetooth: comprobando…</p>
+                <p class="kv" style="margin-bottom:0.5rem;font-size:0.9rem;background:var(--surface2);padding:0.5rem 0.75rem;border-radius:6px;"><strong>WiFi:</strong> IP de esta Pi → Puerto <strong>35000</strong>. <strong>Bluetooth:</strong> Arrancar en Sistema → Emparejar → Elegir esta Pi en la app.</p>
+              </div>
+              <div class="card card-gauges card-dashboard" id="dashboard-gauges">
+                <h3>Tablero</h3>
+                <p id="obd2-status" class="kv status-line"><span class="status-dot off"></span> No conectado</p>
+                <div class="dashboard-cluster">
+                  <div class="dashboard-main">
+                    <div class="cluster-gauge cluster-gauge--speed" data-pid="speed">
+                      <svg class="cluster-gauge-svg" viewBox="0 0 140 90" aria-hidden="true">
+                        <defs>
+                          <linearGradient id="gaugeTrack" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#1a1f2a"/>
+                            <stop offset="100%" stop-color="#0c0e14"/>
+                          </linearGradient>
+                          <linearGradient id="gaugeFill" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#00e5b8"/>
+                            <stop offset="100%" stop-color="#00b894"/>
+                          </linearGradient>
+                        </defs>
+                        <path class="cluster-gauge-track" fill="none" stroke="url(#gaugeTrack)" stroke-width="8" stroke-linecap="round" d="M 15 75 A 55 55 0 0 1 125 75"/>
+                        <path class="cluster-gauge-fill cluster-gauge-fill--speed" fill="none" stroke="url(#gaugeFill)" stroke-width="8" stroke-linecap="round" stroke-dasharray="172.8" d="M 15 75 A 55 55 0 0 1 125 75"/>
+                        <text x="70" y="58" class="cluster-gauge-unit" text-anchor="middle">km/h</text>
+                      </svg>
+                      <div class="cluster-gauge-value-wrap">
+                        <span class="cluster-gauge-value value" id="g-speed">--</span>
+                      </div>
+                      <div class="cluster-gauge-label">Velocidad</div>
+                    </div>
+                    <div class="cluster-gauge cluster-gauge--rpm" data-pid="rpm">
+                      <svg class="cluster-gauge-svg" viewBox="0 0 140 90" aria-hidden="true">
+                        <defs>
+                          <linearGradient id="gaugeTrackRpm" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#1a1f2a"/>
+                            <stop offset="100%" stop-color="#0c0e14"/>
+                          </linearGradient>
+                          <linearGradient id="gaugeFillRpm" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#00e5b8"/>
+                            <stop offset="100%" stop-color="#00b894"/>
+                          </linearGradient>
+                        </defs>
+                        <path class="cluster-gauge-track" fill="none" stroke="url(#gaugeTrackRpm)" stroke-width="8" stroke-linecap="round" d="M 15 75 A 55 55 0 0 1 125 75"/>
+                        <path class="cluster-gauge-fill cluster-gauge-fill--rpm" fill="none" stroke="url(#gaugeFillRpm)" stroke-width="8" stroke-linecap="round" stroke-dasharray="172.8" d="M 15 75 A 55 55 0 0 1 125 75"/>
+                        <text x="70" y="58" class="cluster-gauge-unit" text-anchor="middle">RPM</text>
+                      </svg>
+                      <div class="cluster-gauge-value-wrap">
+                        <span class="cluster-gauge-value value" id="g-rpm">--</span>
+                      </div>
+                      <div class="cluster-gauge-label">Revoluciones</div>
+                    </div>
+                  </div>
+                  <div class="dashboard-secondary">
+                    <div class="cluster-mini gauge" data-pid="coolant">
+                      <div class="cluster-mini-bar"><span class="cluster-mini-fill" id="coolant-fill"></span></div>
+                      <span class="cluster-mini-value value" id="g-coolant">--</span>
+                      <span class="cluster-mini-label">Refrigerante</span>
+                    </div>
+                    <div class="cluster-mini gauge" data-pid="load">
+                      <div class="cluster-mini-bar"><span class="cluster-mini-fill" id="load-fill"></span></div>
+                      <span class="cluster-mini-value value" id="g-load">--</span>
+                      <span class="cluster-mini-label">Carga %</span>
+                    </div>
+                    <div class="cluster-mini gauge" data-pid="intake">
+                      <div class="cluster-mini-bar"><span class="cluster-mini-fill" id="intake-fill"></span></div>
+                      <span class="cluster-mini-value value" id="g-intake">--</span>
+                      <span class="cluster-mini-label">Admisión</span>
+                    </div>
+                    <div class="cluster-mini gauge" data-pid="fuel">
+                      <div class="cluster-mini-bar"><span class="cluster-mini-fill" id="fuel-fill"></span></div>
+                      <span class="cluster-mini-value value" id="g-fuel">--</span>
+                      <span class="cluster-mini-label">Combustible</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="obd2-dispositivos" class="tab-panel" role="tabpanel">
+            <div class="cards">
+              <div class="card card-connections">
+            <h3>Dispositivos conectados</h3>
+            <p class="kv card-hint">Dispositivos que hablan con el emulador: Puerto OBD (CAN), Bluetooth o WiFi (TCP). Se muestra MAC o IP y última actividad.</p>
+            <div class="connections-toolbar">
+              <select id="conn-log-filter" class="input-cmd">
+                <option value="">Todos los dispositivos</option>
+              </select>
+              <span id="connections-count" class="connections-count">0 dispositivos</span>
+            </div>
+            <div class="connections-table-wrap">
+              <table class="connections-table" id="connections-table">
+                <thead>
+                  <tr><th>Cómo se conectó</th><th>MAC / IP</th><th>Última actividad</th></tr>
+                </thead>
+                <tbody id="connections-tbody">
+                  <tr><td colspan="3" class="connections-empty">Ningún dispositivo conectado</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+              <div class="card card-traffic-log">
+                <h3>Consola de tráfico</h3>
+                <p class="kv card-hint">Peticiones que envían los dispositivos y respuestas del emulador. Actualización automática.</p>
+                <pre class="log connection-log" id="connection-log">Esperando tráfico…</pre>
+              </div>
+            </div>
+          </div>
+          <div id="obd2-controles" class="tab-panel" role="tabpanel">
+            <div class="cards">
+              <div class="card card-values">
+            <h3>Valores manuales del emulador</h3>
+            <p class="kv card-hint">Fija los valores que devuelve la ECU. Útil para probar sin simulación automática.</p>
+            <div class="values-grid">
+              <div class="form-row value-row">
+                <label for="val-speed">Velocidad (km/h)</label>
+                <input type="number" id="val-speed" class="input-cmd" min="0" max="255" placeholder="0">
+              </div>
+              <div class="form-row value-row">
+                <label for="val-rpm">RPM</label>
+                <input type="number" id="val-rpm" class="input-cmd" min="0" max="16383" placeholder="820">
+              </div>
+              <div class="form-row value-row">
+                <label for="val-ct">Temp. refrigerante (°C)</label>
+                <input type="number" id="val-ct" class="input-cmd" placeholder="86">
+              </div>
+              <div class="form-row value-row">
+                <label for="val-load">Carga motor (%)</label>
+                <input type="number" id="val-load" class="input-cmd" min="0" max="100" placeholder="18">
+              </div>
+              <div class="form-row value-row">
+                <label for="val-it">Temp. admisión (°C)</label>
+                <input type="number" id="val-it" class="input-cmd" placeholder="28">
+              </div>
+              <div class="form-row value-row">
+                <label for="val-fuel">Combustible (%)</label>
+                <input type="number" id="val-fuel" class="input-cmd" min="0" max="100" placeholder="64">
+              </div>
+            </div>
+            <div class="toolbar">
+              <button class="btn btn-primary" id="val-apply"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"/></svg>Aplicar valores</button>
+            </div>
+          </div>
+          <div class="card card-ecu-profile">
+            <h3>Perfil ECU</h3>
+            <p class="kv card-hint">Elige qué vehículo emula la ECU. Los PIDs y la codificación dependen del perfil. Los archivos están en <code>app/ecu-profiles/*.json</code>.</p>
+            <p id="ecu-profile-current" class="kv"><strong>Perfil activo:</strong> <span id="ecu-profile-name">—</span></p>
+            <div class="form-row">
+              <label for="ecu-profile-select">Cargar perfil</label>
+              <div class="ecu-profile-toolbar">
+                <select id="ecu-profile-select" class="input-cmd">
+                  <option value="">Default (genérico)</option>
+                </select>
+                <button type="button" class="btn btn-primary" id="ecu-profile-load"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-folder-open"/></svg>Cargar</button>
+                <button type="button" class="btn btn-ghost" id="ecu-profile-show"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-eye"/></svg>Ver contenido del perfil</button>
+              </div>
+            </div>
+            <div id="ecu-profile-detail" class="ecu-profile-detail" hidden>
+              <p class="kv"><strong>Contenido del perfil seleccionado</strong></p>
+              <p id="ecu-profile-detail-name" class="kv"></p>
+              <p id="ecu-profile-detail-protocol" class="kv"></p>
+              <div id="ecu-profile-detail-pids" class="ecu-profile-detail-pids"></div>
+            </div>
+          </div>
+          <div class="card card-simulator">
+            <h3>Simulador de conducción</h3>
+            <p class="kv card-hint">Genera valores automáticos según el perfil. Ideal para probar dashboards y apps sin tocar valores a mano.</p>
+            <div class="sim-profiles">
+              <label class="sim-profile-option">
+                <input type="radio" name="sim-profile" value="idle">
+                <span class="sim-profile-name">Ralentí</span>
+                <span class="sim-profile-desc">Velocidad 0, RPM ~820–920, carga baja</span>
+              </label>
+              <label class="sim-profile-option">
+                <input type="radio" name="sim-profile" value="city">
+                <span class="sim-profile-name">Ciudad</span>
+                <span class="sim-profile-desc">20–50 km/h, 1500–2300 RPM, temp. media</span>
+              </label>
+              <label class="sim-profile-option">
+                <input type="radio" name="sim-profile" value="highway">
+                <span class="sim-profile-name">Carretera</span>
+                <span class="sim-profile-desc">80–120 km/h, 2500–3000 RPM</span>
+              </label>
+            </div>
+            <div class="toolbar sim-toolbar">
+              <button class="btn btn-primary" id="sim-start"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-play"/></svg>Iniciar simulación</button>
+              <button class="btn btn-ghost" id="sim-stop"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-stop"/></svg>Detener</button>
+              <span id="sim-status-text" class="sim-status-text"></span>
+            </div>
+          </div>
+          <div class="card card-error-sim">
+            <h3>Simular fallos</h3>
+            <p class="kv card-hint">Haz que ciertos sensores no respondan (NO DATA) o que los valores fluctúen. Sirve para probar el comportamiento de la app ante errores.</p>
+            <div class="error-sim-section">
+              <div class="form-row">
+                <label>Sensores que fallan (sin respuesta)</label>
+                <div class="fail-pids-chk" id="fail-pids-container">
+                  <label class="chk-label"><input type="checkbox" value="010C" class="fail-pid"> RPM (01 0C)</label>
+                  <label class="chk-label"><input type="checkbox" value="010D" class="fail-pid"> Velocidad (01 0D)</label>
+                  <label class="chk-label"><input type="checkbox" value="0105" class="fail-pid"> Temp. refrigerante (01 05)</label>
+                  <label class="chk-label"><input type="checkbox" value="0104" class="fail-pid"> Carga (01 04)</label>
+                  <label class="chk-label"><input type="checkbox" value="010F" class="fail-pid"> Temp. admisión (01 0F)</label>
+                  <label class="chk-label"><input type="checkbox" value="012F" class="fail-pid"> Combustible (01 2F)</label>
+                </div>
+              </div>
+              <div class="form-row">
+                <label for="noise-percent">Inestabilidad de valores (±%)</label>
+                <div class="noise-row">
+                  <input type="range" id="noise-percent" min="0" max="30" value="0" step="1">
+                  <span id="noise-value" class="noise-value">0%</span>
+                </div>
+                <p class="kv form-hint">Añade variación aleatoria a las respuestas para simular sensores inestables.</p>
+              </div>
+            </div>
+            <div class="toolbar">
+              <button class="btn btn-primary" id="error-sim-apply"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"/></svg>Aplicar fallos</button>
+            </div>
+          </div>
+            </div>
+          </div>
+          <div id="obd2-crear-perfil" class="tab-panel" role="tabpanel">
+            <div class="cards">
+              <div class="card card-profile-creator">
+                <h3>Creador de perfiles ECU</h3>
+                <p class="kv card-hint">Arrastra PIDs y DTCs al perfil o usa los botones. Rellena los datos del vehículo y guarda. Los archivos se guardan en <code>app/ecu-profiles/</code>.</p>
+                <div class="profile-creator-form">
+                  <div class="form-row">
+                    <label for="creator-vehicle-name">Nombre del vehículo</label>
+                    <input type="text" id="creator-vehicle-name" class="input-cmd" placeholder="Ej. Chevrolet Captiva 2.4 2010">
+                  </div>
+                  <div class="form-row form-row-inline">
+                    <div>
+                      <label for="creator-profile-id">ID del perfil (archivo)</label>
+                      <input type="text" id="creator-profile-id" class="input-cmd" placeholder="ej. captiva_2010_2.4">
+                    </div>
+                    <div>
+                      <label for="creator-protocol">Protocolo</label>
+                      <select id="creator-protocol" class="input-cmd"></select>
+                    </div>
+                  </div>
+                  <div class="form-row form-row-inline">
+                    <div>
+                      <label for="creator-request-id">Request ID</label>
+                      <input type="text" id="creator-request-id" class="input-cmd" value="0x7DF" placeholder="0x7DF">
+                    </div>
+                    <div>
+                      <label for="creator-response-id">Response ID</label>
+                      <input type="text" id="creator-response-id" class="input-cmd" value="0x7E8" placeholder="0x7E8">
+                    </div>
+                  </div>
+                </div>
+                <div class="profile-creator-drag-area">
+                  <div class="creator-column creator-catalog">
+                    <h4>PIDs disponibles</h4>
+                    <input type="text" id="creator-pid-search" class="input-cmd" placeholder="Buscar PID…">
+                    <div id="creator-pids-catalog" class="creator-list creator-draggable" data-drop-zone="pids"></div>
+                  </div>
+                  <div class="creator-column creator-profile">
+                    <h4>PIDs del perfil</h4>
+                    <div id="creator-pids-profile" class="creator-list creator-drop-zone" data-drop-zone="pids"></div>
+                  </div>
+                </div>
+                <div class="profile-creator-drag-area">
+                  <div class="creator-column creator-catalog">
+                    <h4>Códigos DTC estándar</h4>
+                    <input type="text" id="creator-dtc-search" class="input-cmd" placeholder="Buscar DTC…">
+                    <div id="creator-dtcs-catalog" class="creator-list creator-draggable" data-drop-zone="dtcs"></div>
+                  </div>
+                  <div class="creator-column creator-profile">
+                    <h4>DTC típicos del perfil</h4>
+                    <div id="creator-dtcs-profile" class="creator-list creator-drop-zone" data-drop-zone="dtcs"></div>
+                  </div>
+                </div>
+                <div class="toolbar">
+                  <button type="button" class="btn btn-primary" id="creator-save"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-save"/></svg>Guardar perfil</button>
+                  <button type="button" class="btn btn-ghost" id="creator-download"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-download"/></svg>Descargar JSON</button>
+                  <span id="creator-status" class="creator-status"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="obd2-dtc" class="tab-panel" role="tabpanel">
+            <div class="cards">
+              <div class="card">
+                <h3>DTC (códigos de fallo)</h3>
+                <p class="kv card-hint">Añade o quita códigos de diagnóstico. La ECU los reportará en modo 03/07/0A.</p>
+                <div class="toolbar" style="flex-wrap:wrap;">
+                  <input type="text" id="dtc-code" class="input-cmd" placeholder="P0301" style="width:80px;">
+                  <select id="dtc-mode">
+                    <option value="stored">stored</option>
+                    <option value="pending">pending</option>
+                    <option value="all">all</option>
+                  </select>
+                  <button class="btn btn-primary" id="dtc-on"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-plus"/></svg>Activar</button>
+                  <button class="btn btn-ghost" id="dtc-off"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-stop"/></svg>Desactivar</button>
+                  <button class="btn btn-ghost" id="dtc-clear"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-clear"/></svg>Borrar todos</button>
+                </div>
+                <pre class="log" id="dtc-dump">[]</pre>
+              </div>
+              <div class="card card-obd-cmd">
+                <h3>Comando OBD</h3>
+                <div class="toolbar">
+                  <input type="text" id="obd-cmd" class="input-cmd" placeholder="ATZ / 010C">
+                  <button class="btn btn-primary" id="obd-send"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-send"/></svg>Enviar</button>
+                </div>
+                <pre class="log" id="obd-response">—</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="page-gps" class="page">
+        <h2>Emulador GPS NEO</h2>
+        <div class="gps-pins-info gps-pins-info--page">
+          <strong>Pines que usa el emulador:</strong><br>
+          <span class="gps-pins-list">GPIO14 (pin 8) = TX</span> · <span class="gps-pins-list">GPIO15 (pin 10) = RX</span> · <span class="gps-pins-list">GND = pin 6 o 9</span>. Salida 3,3 V. Conectar <strong>TX de la Pi → RX del dispositivo</strong> que quieres que reciba el GPS (como un NEO real).
+        </div>
+        <div class="cards">
+          <div class="card card-highlight">
+            <h3>Cómo simular el GPS (paso a paso)</h3>
+            <ol class="steps-list">
+              <li><strong>Dejar libre el UART</strong> (solo la primera vez). En la Pi ejecuta <code class="code-inline">sudo raspi-config</code> → Interface Options → Serial Port. Pregunta “Login shell over serial”: <strong>No</strong>. Pregunta “Serial port hardware enabled”: <strong>Sí</strong>. Reinicia. Así el puerto <code class="code-inline">/dev/ttyS0</code> (o <code class="code-inline">/dev/serial0</code>) lo usa el dashboard y no la consola.</li>
+              <li><strong>En esta página (Emulador GPS NEO):</strong> En el desplegable elige el puerto (<code class="code-inline">/dev/ttyS0</code> o <code class="code-inline">/dev/serial0</code> para pines GPIO). Baud rate suele ser <strong>9600</strong>. Pulsa <strong>Abrir puerto</strong>. Debe aparecer “Abierto: /dev/...”.</li>
+              <li><strong>Configurar y arrancar el envío:</strong> En esta misma página, en la sección <strong>Posición y envío por serial</strong> (más abajo), puedes:
+                <ul style="margin-top:0.35rem;">
+                  <li>Poner <strong>lat</strong>, <strong>lon</strong> (y opcional alt, satélites, rumbo) y dejar “ruta off” para un punto fijo.</li>
+                  <li>O activar “ruta on”, poner <strong>radio (m)</strong> y <strong>vel km/h</strong> para simular un recorrido en círculo.</li>
+                </ul>
+                Pulsa <strong>Aplicar</strong> y luego <strong>Iniciar envío por serial</strong>. El dashboard enviará tramas NMEA (GPRMC, GPGGA, etc.) por el pin TX de la Pi cada cierto intervalo (campo “ms”).</li>
+              <li>El dispositivo conectado a los pines (su <strong>RX</strong> al <strong>TX</strong> de la Pi, GND común) recibirá esas tramas como si fuera un GPS NEO real.</li>
+            </ol>
+            <p class="kv" style="margin-top:0.75rem;font-size:0.9rem;color:var(--text-muted);">Si no ves el puerto en el desplegable, recarga la página. Si al abrir da error, comprueba que la consola serial esté desactivada en <code class="code-inline">raspi-config</code>.</p>
+          </div>
+          <div class="card">
+            <h3>Puerto serial</h3>
+            <div class="form-row">
+              <label>Puerto (ej. /dev/ttyS0 para pines GPIO)</label>
+              <select id="gps-port"><option value="">— Selecciona —</option></select>
+            </div>
+            <div class="form-row">
+              <label>Baud rate</label>
+              <select id="gps-baud">
+                <option value="9600">9600</option>
+                <option value="38400">38400</option>
+                <option value="57600">57600</option>
+                <option value="115200">115200</option>
+              </select>
+            </div>
+            <div class="toolbar">
+              <button class="btn btn-primary" id="gps-open"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-unlock"/></svg>Abrir puerto</button>
+              <button class="btn btn-ghost" id="gps-close"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-lock"/></svg>Cerrar</button>
+              <span id="gps-open-status" class="kv" style="margin-left:0.5rem;"></span>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Enviar mensaje NMEA</h3>
+            <div class="form-row">
+              <input type="text" id="gps-nmea" class="input-cmd input-nmea" placeholder="$GPRMC,...">
+            </div>
+            <button class="btn btn-primary" id="gps-send"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-send"/></svg>Enviar por serial</button>
+          </div>
+          <div class="card">
+            <h3>Posición y envío por serial</h3>
+            <p class="kv card-hint">Abre el puerto serial arriba en esta página (ej. /dev/serial0). Las tramas NMEA se envían por TX como un GPS real. Punto fijo o ruta simulada; opcionalmente simula errores.</p>
+            <div class="form-row">
+              <label>Posición / centro (lat, lon) — por defecto Bogotá</label>
+              <div class="toolbar" style="flex-wrap:wrap;">
+                <input type="number" id="gps-lat" class="input-cmd" placeholder="lat" step="any" value="4.711" style="width:90px;">
+                <input type="number" id="gps-lon" class="input-cmd" placeholder="lon" step="any" value="-74.072" style="width:90px;">
+                <input type="text" id="gps-alt" class="input-cmd" placeholder="alt m" value="1000" style="width:70px;">
+                <input type="text" id="gps-sats" class="input-cmd" placeholder="sats fijo" style="width:70px;" title="N.º fijo de satélites (vacío = aleatorio)">
+                <span class="gps-sats-rand" title="Min y max para número aleatorio por trama">aleatorio</span>
+                <input type="number" id="gps-sats-min" class="input-cmd" placeholder="min" min="0" max="12" value="4" style="width:52px;">
+                <input type="number" id="gps-sats-max" class="input-cmd" placeholder="max" min="0" max="12" value="12" style="width:52px;">
+                <input type="text" id="gps-course" class="input-cmd" placeholder="course °" style="width:70px;">
+                <input type="text" id="gps-baud-t38" class="input-cmd" placeholder="baud" style="width:70px;">
+              </div>
+            </div>
+            <div class="form-row">
+              <label>Ruta</label>
+              <div class="toolbar" style="flex-wrap:wrap;">
+                <select id="gps-route-on"><option value="1">ruta on</option><option value="0">ruta off</option></select>
+                <input type="text" id="gps-radius" class="input-cmd" placeholder="radio m (círculo)" value="1000" style="width:90px;">
+                <span class="kv" style="font-size:0.85rem;color:var(--text-muted);">Vel. km/h:</span>
+                <input type="number" id="gps-speed-min" class="input-cmd" placeholder="mín" min="0" max="200" value="20" style="width:64px;" title="Velocidad mínima (frenado en curvas/paradas)">
+                <input type="number" id="gps-speed-max" class="input-cmd" placeholder="máx" min="0" max="200" value="50" style="width:64px;" title="Velocidad máxima (rectas)">
+                <input type="number" id="gps-interval" class="input-cmd" placeholder="ms" min="200" style="width:70px;" title="Intervalo entre tramas (ms)">
+              </div>
+            </div>
+            <div class="form-row">
+              <label>Rutas guardadas</label>
+              <div class="toolbar" style="flex-wrap:wrap;">
+                <select id="gps-saved-route" class="input-cmd" style="min-width:180px;">
+                  <option value="">— Cargar ruta guardada —</option>
+                </select>
+                <button type="button" class="btn btn-ghost" id="gps-load-saved-route"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-folder-open"/></svg>Cargar esta ruta</button>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>Waypoints (opcional, JSON)</label>
+              <textarea id="gps-waypoints" class="input-cmd" rows="2" placeholder='[{"lat":40.4,"lon":-3.7},{"lat":40.41,"lon":-3.69}]' style="width:100%;max-width:480px;resize:vertical;"></textarea>
+              <p class="form-hint">Si está vacío se usa ruta circular alrededor de (lat,lon). Si pones un array de {lat,lon}, la ruta avanza por esos puntos. Puedes crear rutas en <strong>Creador de rutas</strong>.</p>
+            </div>
+            <div class="form-row">
+              <label>Simular errores GPS</label>
+              <div class="gps-error-sim">
+                <label class="chk-label"><input type="checkbox" id="gps-no-fix" value="1"> Sin fix (tramas inválidas)</label>
+                <label class="chk-label"><input type="checkbox" id="gps-bad-hdop" value="1"> HDOP malo</label>
+                <input type="number" id="gps-jitter" class="input-cmd" min="0" step="0.5" placeholder="jitter m" style="width:80px;" title="Ruido en posición (metros)">
+                <input type="number" id="gps-drop" class="input-cmd" min="0" max="100" placeholder="% drop" style="width:70px;" title="% de tramas que no se envían">
+              </div>
+            </div>
+            <p class="kv gps-serial-status" id="gps-t38-serial-status" style="margin-bottom:0.75rem;font-size:0.9rem;"></p>
+            <div class="toolbar">
+              <button class="btn btn-primary" id="gps-t38-apply"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"/></svg>Aplicar</button>
+              <button class="btn btn-primary" id="gps-t38-start"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-play"/></svg>Iniciar envío por serial</button>
+              <button class="btn btn-ghost" id="gps-t38-stop"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-stop"/></svg>Detener</button>
+            </div>
+            <pre class="log" id="gps-t38-state" style="max-height:120px;">{}</pre>
+            <h3 style="margin-top:1.25rem;">Información que envía el GPS</h3>
+            <p class="kv" style="margin-bottom:0.5rem;">Por el pin TX (GPIO 14) se envían tramas <strong>NMEA 0183</strong> cada cierto intervalo (campo «ms»):</p>
+            <ul class="kv gps-nmea-info" style="margin:0.35rem 0 0.75rem 1rem;font-size:0.85rem;">
+              <li><strong>$GPGGA</strong> — Hora UTC, latitud, longitud, calidad del fix (0/1), número de satélites, HDOP, altitud (m).</li>
+              <li><strong>$GPRMC</strong> — Hora UTC, estado (A=válido, V=inválido), latitud, longitud, velocidad (nudos), rumbo (°), fecha UTC.</li>
+            </ul>
+            <p class="kv" style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.5rem;">Cada trama termina en <code class="code-inline">*XX</code> (checksum). El dispositivo conectado al RX recibe estas líneas como un GPS NEO real.</p>
+            <label class="kv" style="display:block;margin-bottom:0.35rem;font-size:0.8rem;color:var(--text-muted);">Últimas tramas enviadas (se actualiza con el envío):</label>
+            <p class="kv gps-last-sent-hint" id="gps-last-sent-hint" style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.25rem;display:none;">Abre el puerto serial arriba y pulsa <strong>Iniciar envío por serial</strong> para ver las tramas aquí.</p>
+            <pre class="log gps-last-sent" id="gps-last-sent" style="max-height:140px;min-height:3em;">—</pre>
+            <h3 style="margin-top:1.25rem;">Mapa — Posición simulada</h3>
+            <p class="kv" style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.5rem;">Si está configurada la clave de Google Maps (variable <code class="code-inline">GOOGLE_MAPS_API_KEY</code> en <code class="code-inline">.env</code>), aquí se muestra la posición actual del emulador.</p>
+            <p class="kv gps-map-gesture-hint" style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem;">Inclinar/rotar: <strong>Ctrl</strong> + arrastrar con el ratón (o dos dedos en táctil). Botones abajo para vista 2D o inclinada.</p>
+            <div id="gps-map-wrap" class="gps-map-wrap">
+              <div id="gps-map" class="gps-map" aria-label="Mapa de la posición GPS simulada"></div>
+              <div class="gps-map-controls" id="gps-map-controls" style="display:none;">
+                <button type="button" class="btn btn-ghost gps-map-btn" id="gps-map-view-2d" title="Vista desde arriba (sin inclinación ni rotación)"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-eye"/></svg>Vista 2D</button>
+                <button type="button" class="btn btn-ghost gps-map-btn" id="gps-map-tilt" title="Inclinar mapa 45°"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-tilt"/></svg>Inclinar 45°</button>
+                <button type="button" class="btn btn-ghost gps-map-btn" id="gps-map-rotate-90" title="Rotar mapa 90°"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-rotate"/></svg>Rotar 90°</button>
+              </div>
+              <p id="gps-map-no-key" class="kv gps-map-no-key" style="display:none;">Sin clave de Google Maps. Crea un <code class="code-inline">.env</code> con <code class="code-inline">GOOGLE_MAPS_API_KEY=tu_clave</code> (no subas el .env a Git).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="page-routes" class="page">
+        <div class="route-creator-layout">
+          <div class="route-creator-left">
+            <h2>Creador de rutas</h2>
+            <p class="kv route-creator-intro">Pon <strong>Inicio</strong> y <strong>Fin</strong>, opcionalmente <strong>Paradas</strong>. Se genera la ruta por carretera. Arrastra los marcadores para moverlos; elimina paradas con la X. Elige arriba «Inicio», «Fin» o «Parada» y haz clic en el mapa; luego pulsa «Generar ruta».</p>
+            <div class="card route-creator-map-wrap">
+              <h3>Mapa</h3>
+              <div class="route-creator-mode-toolbar">
+                <span class="kv" style="font-size:0.85rem;color:var(--text-muted);margin-right:0.5rem;">Poner:</span>
+                <button type="button" class="btn btn-ghost route-mode-btn active" id="route-mode-start" data-mode="start"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-flag-start"/></svg>Inicio</button>
+                <button type="button" class="btn btn-ghost route-mode-btn" id="route-mode-end" data-mode="end"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-flag-end"/></svg>Fin</button>
+                <button type="button" class="btn btn-ghost route-mode-btn" id="route-mode-waypoint" data-mode="waypoint"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-pin"/></svg>Parada</button>
+                <button type="button" class="btn btn-primary" id="route-creator-request"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-route"/></svg>Generar ruta</button>
+              </div>
+              <div id="route-creator-heat-wrap" class="route-creator-heat-wrap" style="display:none;">
+                <label for="route-creator-heat-sensor">Color por sensor:</label>
+                <select id="route-creator-heat-sensor" class="input-cmd route-creator-heat-select" title="Ver ruta coloreada por sensor"></select>
+                <span id="route-creator-heat-legend" class="route-creator-heat-legend"></span>
+              </div>
+              <div id="route-creator-map" class="route-creator-map" aria-label="Mapa para crear ruta"></div>
+              <p id="route-creator-map-no-key" class="gps-map-no-key" style="display:none;">Configura <code class="code-inline">GOOGLE_MAPS_API_KEY</code> en <code class="code-inline">.env</code> para usar el creador de rutas.</p>
+              <p id="route-creator-map-help" class="kv gps-map-no-key" style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted);">
+                Si aparece <em>«This page can't load Google Maps correctly / Are you the owner of this website?»</em>: en
+                <a href="https://console.cloud.google.com/apis/library/maps-backend.googleapis.com" target="_blank" rel="noopener">Google Cloud Console</a>
+                activa <strong>Maps JavaScript API</strong>, vincula una cuenta de facturación y en la clave API (APIs &amp; Services → Credentials) añade en restricciones de aplicación web las URLs permitidas, por ejemplo <code class="code-inline">http://localhost:3000/*</code> y <code class="code-inline">http://TU_IP:3000/*</code> (la URL desde la que abres el dashboard).
+              </p>
+            </div>
+          </div>
+          <div class="card route-creator-sidebar">
+            <h3>Inicio, paradas y fin</h3>
+            <ul id="route-creator-points" class="route-creator-points-list"></ul>
+            <div id="route-creator-point-editor" class="route-creator-point-editor card" style="display:none; margin-top:0.75rem;">
+              <p class="route-creator-point-editor-title" style="font-weight:600;margin:0 0 0.5rem 0;">Punto en la ruta</p>
+              <p style="font-size:0.85rem;color:var(--text-muted);margin:0 0 0.5rem 0;">Haz clic en la ruta para editar un punto. Aquí puedes cambiar coordenadas y sensores.</p>
+              <div class="form-row"><label>Lat</label><input type="number" id="route-point-edit-lat" class="input-cmd" step="any" placeholder="—"></div>
+              <div class="form-row"><label>Lon</label><input type="number" id="route-point-edit-lon" class="input-cmd" step="any" placeholder="—"></div>
+              <div class="form-row"><label>Velocidad (km/h)</label><input type="number" id="route-point-edit-speed" class="input-cmd" step="0.1" min="0" placeholder="—"></div>
+              <div class="form-row"><label>RPM</label><input type="number" id="route-point-edit-rpm" class="input-cmd" min="0" placeholder="—"></div>
+              <div class="form-row"><label>Altitud (m)</label><input type="number" id="route-point-edit-alt" class="input-cmd" step="0.1" placeholder="—"></div>
+              <div class="toolbar" style="margin-top:0.5rem;">
+                <button type="button" class="btn btn-primary" id="route-point-edit-apply">Aplicar</button>
+                <button type="button" class="btn btn-ghost" id="route-point-edit-close">Cerrar</button>
+              </div>
+            </div>
+            <div class="toolbar" style="flex-wrap:wrap;margin-top:0.75rem;">
+              <button type="button" class="btn btn-ghost" id="route-creator-clear"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-clear"/></svg>Limpiar todo</button>
+              <button type="button" class="btn btn-ghost" id="route-creator-redo" title="Volver a generar la ruta con los mismos puntos">Rehacer</button>
+            </div>
+            <h3 style="margin-top:1.25rem;">Guardar ruta</h3>
+            <div class="form-row">
+              <label>Nombre</label>
+              <input type="text" id="route-creator-name" class="input-cmd" placeholder="Ej. Bogotá centro" style="width:100%;">
+            </div>
+            <button type="button" class="btn btn-primary" id="route-creator-save" style="margin-top:0.5rem;"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-save"/></svg>Guardar ruta</button>
+            <h3 style="margin-top:1.25rem;">Rutas guardadas</h3>
+            <div class="route-creator-saved-toolbar">
+              <label for="route-creator-sort" class="route-creator-sort-label">Ordenar por</label>
+              <select id="route-creator-sort" class="input-cmd route-creator-sort-select" title="Ordenar lista de rutas"></select>
+            </div>
+            <ul id="route-creator-saved-list" class="route-creator-saved-list"></ul>
+          </div>
+        </div>
+      </div>
+      <div id="page-hardware" class="page">
+        <h2>Componentes de hardware — Raspberry Pi 4</h2>
+        <p class="kv" style="margin-bottom:1.25rem;">Listado y diagramas de conexión para el emulador OBD2 y GPS NEO.</p>
+        <div class="cards">
+          <div class="card">
+            <h3>Listado de componentes</h3>
+            <table class="hw-table">
+              <thead>
+                <tr><th>Componente</th><th>Descripción / Uso</th><th>Conexión</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Raspberry Pi 4</strong></td><td>Placa principal (2/4/8 GB RAM). Ejecuta el dashboard y los emuladores.</td><td>—</td></tr>
+                <tr><td>Fuente de alimentación</td><td>5 V DC, mínimo 3 A (USB-C). Alimentación estable para la Pi 4.</td><td>Conector USB-C</td></tr>
+                <tr><td>Tarjeta microSD</td><td>Almacenamiento del sistema (Raspberry Pi OS). 16 GB o más recomendado.</td><td>Ranura microSD</td></tr>
+                <tr><td>Puerto OBD2 hembra</td><td>Conector hembra OBD2 (16 pines). El dispositivo que quieres probar (lector, app, etc.) se conecta aquí.</td><td>Ver sección "Conexión OBD2 → Pi 4" abajo</td></tr>
+                <tr><td>UART (serial)</td><td>Emulador GPS NEO: envío/recepción de mensajes NMEA por pines GPIO.</td><td class="pin">GPIO 14 (TX) · Pin 8<br>GPIO 15 (RX) · Pin 10<br>GND · Pin 6, 9, 14…</td></tr>
+                <tr><td>WiFi / Ethernet</td><td>Red integrada en la Pi 4. Dashboard accesible por navegador.</td><td>Integrado</td></tr>
+                <tr><td>Bluetooth (opcional)</td><td>Dongle USB BT si se necesita más de un adaptador o la Pi no tiene BT integrado.</td><td>Puerto USB</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Tus componentes (referencia)</h3>
+            <p class="kv" style="margin-bottom:1rem;">Encajan en la <strong>Opción B</strong> (CAN por SPI). En la tabla se indica cómo se usan y qué falta.</p>
+            <table class="hw-table">
+              <thead>
+                <tr><th>Componente</th><th>Uso en el montaje</th><th>Referencia</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Transceptor CAN MCP2551</strong></td>
+                  <td>Transceptor de alta velocidad (capa física CAN). Se conecta al <strong>MCP2515</strong> por Tx/Rx y al bus CAN (pines 6 y 14 del OBD2). Alimentación 5 V. Compatible con ISO-11898, hasta 1 Mb/s.</td>
+                  <td>Módulo MCP2551</td>
+                </tr>
+                <tr>
+                  <td><strong>Enchufe macho OBD2, 16 pines</strong></td>
+                  <td>Conector macho (sin cable). Para conectar al vehículo o unir con cable a los pines del conector hembra (CAN_H, CAN_L, GND).</td>
+                  <td>Conector macho OBD2</td>
+                </tr>
+                <tr>
+                  <td><strong>Enchufe hembra OBD2, 16 pines</strong></td>
+                  <td>Conector hembra. Es el "puerto" donde enchufas el dispositivo a probar. Pin <strong>6</strong> = CAN_H, pin <strong>14</strong> = CAN_L, pin <strong>4 o 5</strong> = GND.</td>
+                  <td>Conector hembra OBD2</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="kv" style="margin-top:1rem;font-size:0.9rem;"><strong>Qué falta para cerrar el circuito:</strong> un módulo <strong>MCP2515</strong> (controlador CAN por SPI). Cadena: <strong>Raspberry Pi 4</strong> (GPIO SPI) → <strong>MCP2515</strong> → <strong>MCP2551</strong> → pines 6, 14 y GND del <strong>conector hembra OBD2</strong>.</p>
+          </div>
+          <div class="card">
+            <h3>Conector OBD2 — Numeración y pines (referencia)</h3>
+            <p class="kv" style="margin-bottom:0.75rem;">Usa la misma numeración y colores que en la imagen para identificar cada pin en el conector hembra OBD2 (16 pines).</p>
+            <figure class="diagram diagram-img diagram-img-wrap">
+              <img src="/imagenes/obd2.webp" alt="Conector OBD2 — numeración de pines" class="diagram-img-large" width="560" height="auto" loading="lazy"/>
+              <button type="button" class="btn btn-ghost btn-img-large" aria-label="Ver imagen grande"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-eye"/></svg>Ver grande</button>
+              <figcaption>Conector OBD2 (16 pines). Numeración estándar J1962.</figcaption>
+            </figure>
+            <table class="hw-table pin-table">
+              <thead>
+                <tr><th>Nº (imagen)</th><th>Señal</th><th>Color ref.</th><th>Conectar a</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>4</strong></td><td>Chassis GND</td><td><span class="wire-dot black"></span> Negro</td><td>Masa común / MCP2551 GND</td></tr>
+                <tr><td><strong>5</strong></td><td>Signal GND</td><td><span class="wire-dot black"></span> Negro</td><td>Masa señal / MCP2551 GND</td></tr>
+                <tr><td><strong>6</strong></td><td>CAN High (CAN_H)</td><td><span class="wire-dot green"></span> Verde</td><td>MCP2551 CAN_H</td></tr>
+                <tr><td><strong>14</strong></td><td>CAN Low (CAN_L)</td><td><span class="wire-dot yellow"></span> Amarillo</td><td>MCP2551 CAN_L</td></tr>
+                <tr><td><strong>16</strong></td><td>+12 V (batería)</td><td><span class="wire-dot red"></span> Rojo</td><td>Alimentación (solo si conectas al vehículo)</td></tr>
+                <tr><td>1, 3, 7, 8, 9, 10, 11, 12, 13, 15</td><td>Otros (J1850, K-Line, etc.)</td><td>—</td><td>No usados en montaje CAN (Opción B)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Módulo / cable CAN (MCP2551) — Dónde va cada hilo</h3>
+            <p class="kv" style="margin-bottom:0.75rem;">Con la misma numeración y colores que en la imagen, lleva cada salida del transceptor CAN al conector OBD2 y a alimentación/masa.</p>
+            <figure class="diagram diagram-img diagram-img-wrap">
+              <img src="/imagenes/can.webp" alt="Módulo CAN — pines y colores" width="320" height="auto" loading="lazy"/>
+              <button type="button" class="btn btn-ghost btn-img-large" aria-label="Ver imagen grande"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-eye"/></svg>Ver grande</button>
+              <figcaption>Transceptor CAN (ej. MCP2551). Identifica CAN_H, CAN_L, GND y VCC.</figcaption>
+            </figure>
+            <table class="hw-table pin-table">
+              <thead>
+                <tr><th>Señal (imagen)</th><th>Color ref.</th><th>Conectar a</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>CAN_H</strong></td><td><span class="wire-dot green"></span> Verde</td><td>Pin <strong>6</strong> del conector OBD2 hembra</td></tr>
+                <tr><td><strong>CAN_L</strong></td><td><span class="wire-dot yellow"></span> Amarillo</td><td>Pin <strong>14</strong> del conector OBD2 hembra</td></tr>
+                <tr><td><strong>GND</strong></td><td><span class="wire-dot black"></span> Negro</td><td>Pin <strong>4</strong> o <strong>5</strong> del OBD2 y GND de la Raspberry Pi</td></tr>
+                <tr><td><strong>VCC (+5 V)</strong></td><td><span class="wire-dot red"></span> Rojo</td><td>5 V de la Raspberry Pi (pin 2 o 4)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Raspberry Pi — Cabecera de 40 pines (GPIO)</h3>
+            <p class="kv" style="margin-bottom:0.75rem;">Usa la misma numeración que en la imagen para localizar cada pin en la cabecera de la Pi. Niveles 3,3 V en GPIO.</p>
+            <figure class="diagram diagram-img diagram-img-wrap">
+              <img src="/imagenes/Pines PI.png" alt="Raspberry Pi — numeración de pines GPIO" width="400" height="auto" loading="lazy"/>
+              <button type="button" class="btn btn-ghost btn-img-large" aria-label="Ver imagen grande"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-eye"/></svg>Ver grande</button>
+              <figcaption>Raspberry Pi — 40 pines. Numeración como en la imagen.</figcaption>
+            </figure>
+            <table class="hw-table pin-table">
+              <thead>
+                <tr><th>Pin (imagen)</th><th>Función</th><th>Conectar a</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>1</strong></td><td>3V3</td><td>Alimentación 3,3 V</td></tr>
+                <tr><td><strong>2</strong></td><td>5 V</td><td>Alimentación 5 V (MCP2551, MCP2515)</td></tr>
+                <tr><td><strong>6</strong></td><td>GND</td><td>Masa común (UART, CAN, escudos)</td></tr>
+                <tr><td><strong>8</strong></td><td>GPIO 14 (TXD)</td><td>UART TX → GPS/serial (entrada RX del dispositivo)</td></tr>
+                <tr><td><strong>10</strong></td><td>GPIO 15 (RXD)</td><td>UART RX ← GPS/serial (salida TX del dispositivo)</td></tr>
+                <tr><td><strong>19</strong></td><td>GPIO 10 (MOSI)</td><td>SPI → MCP2515 MOSI (Opción B CAN)</td></tr>
+                <tr><td><strong>21</strong></td><td>GPIO 9 (MISO)</td><td>SPI ← MCP2515 MISO (Opción B CAN)</td></tr>
+                <tr><td><strong>23</strong></td><td>GPIO 11 (SCLK)</td><td>SPI → MCP2515 SCLK (Opción B CAN)</td></tr>
+                <tr><td><strong>24</strong></td><td>GPIO 8 (CE0)</td><td>SPI CS → MCP2515 CS (Opción B CAN)</td></tr>
+                <tr><td><strong>25</strong></td><td>GND</td><td>Masa</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Conexión OBD2 hembra a la Raspberry Pi 4</h3>
+            <p class="kv" style="margin-bottom:1rem;">Dos opciones habituales:</p>
+            <div class="obd-connection-options">
+              <div class="obd-option">
+                <h4 class="obd-option-title">Opción A — Adaptador USB-OBD2</h4>
+                <p class="kv" style="margin-bottom:0.5rem;">Cable/adaptador con conector <strong>hembra</strong> OBD2 en un extremo y <strong>USB</strong> en el otro. Se conecta a un puerto USB de la Pi. En la Pi suele verse como <code class="code-inline">/dev/ttyUSB0</code>.</p>
+              </div>
+              <div class="obd-option">
+                <h4 class="obd-option-title">Opción B — CAN por GPIO (SPI): MCP2515 + MCP2551</h4>
+                <p class="kv" style="margin-bottom:0.5rem;">Pi (SPI) → <strong>MCP2515</strong> → <strong>MCP2551</strong> → cables a pines 6 (CAN_H), 14 (CAN_L) y 4/5 (GND) del conector hembra OBD2. Software: socketCAN en la Pi.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Conexión paso a paso — Opción B</h3>
+            <h4 style="font-size:0.95rem;margin-bottom:0.5rem;">1. Raspberry Pi → MCP2515</h4>
+            <table class="hw-table pin-table">
+              <thead>
+                <tr><th>Raspberry Pi (pin físico)</th><th>MCP2515</th><th>Color sugerido</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Pin 2 (5 V)</td><td>VCC</td><td><span class="wire-dot red"></span> Rojo</td></tr>
+                <tr><td>Pin 6 (GND)</td><td>GND</td><td><span class="wire-dot black"></span> Negro</td></tr>
+                <tr><td>Pin 19 (GPIO 10 / MOSI)</td><td>SI</td><td><span class="wire-dot blue"></span> Azul</td></tr>
+                <tr><td>Pin 21 (GPIO 9 / MISO)</td><td>SO</td><td><span class="wire-dot green"></span> Verde</td></tr>
+                <tr><td>Pin 23 (GPIO 11 / SCK)</td><td>SCK</td><td><span class="wire-dot yellow"></span> Amarillo</td></tr>
+                <tr><td>Pin 24 (GPIO 8 / CE0)</td><td>CS</td><td><span class="wire-dot white"></span> Blanco</td></tr>
+                <tr><td>Pin 22 (GPIO 25)</td><td>INT</td><td><span class="wire-dot orange"></span> Naranja</td></tr>
+              </tbody>
+            </table>
+            <h4 style="font-size:0.95rem;margin:1rem 0 0.5rem;">2. MCP2515 → Conector hembra OBD2</h4>
+            <table class="hw-table pin-table">
+              <thead>
+                <tr><th>MCP2515</th><th>OBD2 hembra</th><th>Función</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>CAN_H</td><td>Pin <strong>6</strong></td><td>Señal alta</td></tr>
+                <tr><td>CAN_L</td><td>Pin <strong>14</strong></td><td>Señal baja</td></tr>
+                <tr><td>GND</td><td>Pin <strong>4</strong> o <strong>5</strong></td><td>Tierra</td></tr>
+              </tbody>
+            </table>
+            <h4 style="font-size:0.95rem;margin:1rem 0 0.5rem;">3. Ver tráfico CAN (candump)</h4>
+            <p class="kv" style="margin-bottom:0.5rem;">Activar SPI y overlay MCP2515 en <code class="code-inline">/boot/firmware/config.txt</code> (o <code class="code-inline">/boot/config.txt</code>):</p>
+            <pre style="margin:0.35rem 0;padding:0.5rem;background:var(--surface2);border-radius:6px;font-size:0.8rem;overflow-x:auto;">dtparam=spi=on
+dtoverlay=mcp2515-can0,oscillator=8000000,interrupt=25</pre>
+            <p class="kv" style="font-size:0.85rem;color:var(--text-muted);">Usa <strong>oscillator=8000000</strong> si el cristal del MCP2515 es 8 MHz (ej. dice &quot;8.000&quot;). Si es 16 MHz, pon <code>16000000</code>.</p>
+            <p class="kv" style="margin-top:0.5rem;font-size:0.9rem;">Herramientas: <code class="code-inline">sudo apt install -y can-utils</code>. Subir interfaz y ver tráfico:</p>
+            <pre style="margin:0.35rem 0;padding:0.5rem;background:var(--surface2);border-radius:6px;font-size:0.8rem;">sudo ip link set can0 up type can bitrate 500000
+candump can0</pre>
+            <p class="kv" style="font-size:0.85rem;color:var(--text-muted);">O ejecutar <code class="code-inline">sudo ~/dashboard/scripts/can0-up.sh</code> para subir can0.</p>
+            <h4 style="font-size:0.95rem;margin:1rem 0 0.5rem;">4. Arranque al reiniciar la Pi (servicio)</h4>
+            <p class="kv" style="margin-bottom:0.5rem;">Para que el bus CAN esté UP antes de que arranque la app (y el kiosk):</p>
+            <ul class="kv" style="margin:0.35rem 0;padding-left:1.25rem;font-size:0.9rem;">
+              <li>Script <code class="code-inline">scripts/ensure-can0-boot.sh</code>: espera hasta 20 s a que exista can0 (MCP2515) y lo sube a 500 kbps.</li>
+              <li>Servicio <code class="code-inline">tracker360-dashboard.service</code>: ejecuta ese script y luego la app. Instalación: <code class="code-inline">sudo cp deploy/tracker360-dashboard.service /etc/systemd/system/</code>, <code class="code-inline">sudo systemctl daemon-reload</code>, <code class="code-inline">sudo systemctl enable tracker360-dashboard.service</code>.</li>
+              <li>Si al ejecutar los scripts sale &quot;No such file&quot;, suele ser por finales de línea Windows (CRLF). En la Pi: <code class="code-inline">sed -i 's/\r$//' ~/dashboard/scripts/ensure-can0-boot.sh ~/dashboard/scripts/can0-up.sh</code> y <code class="code-inline">chmod +x ~/dashboard/scripts/*.sh</code>.</li>
+            </ul>
+            <h4 style="font-size:0.95rem;margin:1rem 0 0.5rem;">5. Terminación del bus (J1)</h4>
+            <p class="kv" style="font-size:0.9rem;">Muchos módulos MCP2515 tienen un jumper <strong>J1</strong> que activa una resistencia de 120 Ω. Con dos nodos en el bus (Pi + lector/ELM) suele ir <strong>sin</strong> el jumper en la Pi si el otro nodo ya lleva terminación; si no hay comunicación, prueba <strong>con</strong> J1 puesto o quitado.</p>
+          </div>
+          <div class="card">
+            <h3>Pines GPIO — UART (GPS NEO)</h3>
+            <p class="kv" style="margin-bottom:0.75rem;">Conexión estándar. Niveles 3,3 V.</p>
+            <div class="pinout-grid">
+              <div class="pinout-pin"><span class="pinout-num">8</span><span class="pinout-name">GPIO 14</span><span class="pinout-role">UART TX</span></div>
+              <div class="pinout-pin"><span class="pinout-num">10</span><span class="pinout-name">GPIO 15</span><span class="pinout-role">UART RX</span></div>
+              <div class="pinout-pin"><span class="pinout-num">6</span><span class="pinout-name">GND</span><span class="pinout-role">Referencia</span></div>
+              <div class="pinout-pin"><span class="pinout-num">1</span><span class="pinout-name">3.3V</span><span class="pinout-role">Alimentación</span></div>
+            </div>
+            <p class="kv" style="margin-top:0.75rem;font-size:0.8rem;color:var(--text-muted);">Desactiva la consola serial en <code class="code-inline">raspi-config</code> (Interface Options → Serial Port) para usar UART en /dev/ttyS0.</p>
+          </div>
+          <div class="card">
+            <h3>Diagrama de bloques — Sistema completo</h3>
+            <div class="diagram">
+              <h4>Vista general del emulador</h4>
+              <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+                <rect x="160" y="40" width="160" height="120" rx="8" fill="#161922" stroke="#00d4aa" stroke-width="2"/>
+                <text x="240" y="75" text-anchor="middle" fill="#00d4aa" font-size="14" font-weight="600">Raspberry Pi 4</text>
+                <text x="240" y="95" text-anchor="middle" fill="#e6e8ec" font-size="10">Dashboard · OBD2 · GPS NEO</text>
+                <text x="240" y="115" text-anchor="middle" fill="#8b8f9e" font-size="9">WiFi · BT · UART · USB</text>
+                <rect x="20" y="70" width="100" height="60" rx="6" fill="#161922" stroke="#2a2e3d" stroke-width="1.5"/>
+                <text x="70" y="95" text-anchor="middle" fill="#e6e8ec" font-size="10">Puerto OBD2</text>
+                <text x="70" y="112" text-anchor="middle" fill="#8b8f9e" font-size="9">hembra</text>
+                <line x1="120" y1="100" x2="158" y2="100" stroke="#2a2e3d" stroke-width="1.5"/>
+                <text x="138" y="95" fill="#8b8f9e" font-size="8">USB/CAN</text>
+                <rect x="360" y="70" width="100" height="60" rx="6" fill="#161922" stroke="#2a2e3d" stroke-width="1.5"/>
+                <text x="410" y="95" text-anchor="middle" fill="#e6e8ec" font-size="10">GPS NEO</text>
+                <text x="410" y="112" text-anchor="middle" fill="#8b8f9e" font-size="9">UART TX/RX</text>
+                <line x1="360" y1="100" x2="322" y2="100" stroke="#2a2e3d" stroke-width="1.5"/>
+                <text x="340" y="95" fill="#8b8f9e" font-size="8">GPIO 14/15</text>
+                <rect x="190" y="170" width="100" height="24" rx="4" fill="#161922" stroke="#2a2e3d" stroke-width="1"/>
+                <text x="240" y="186" text-anchor="middle" fill="#8b8f9e" font-size="9">Navegador (dashboard)</text>
+                <line x1="240" y1="160" x2="240" y2="170" stroke="#2a2e3d" stroke-dasharray="3 2"/>
+                <text x="240" y="205" text-anchor="middle" fill="#8b8f9e" font-size="8">WiFi / Ethernet :3000</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="page-ayuda" class="page page-ayuda-manual">
+        <header class="manual-header">
+          <h2>Manual de usuario</h2>
+          <p class="manual-subtitle">Guía de pantallas y funciones del dashboard. Las imágenes son capturas reales de la interfaz.</p>
+        </header>
+        <nav class="manual-toc" aria-label="Índice del manual">
+          <h3 class="manual-toc-title">Índice</h3>
+          <ol class="manual-toc-list">
+            <li><a href="#ayuda-menu">Dónde está el menú</a></li>
+            <li><a href="#ayuda-resumen">Resumen</a></li>
+            <li><a href="#ayuda-sistema">Sistema (Pi)</a></li>
+            <li><a href="#ayuda-obd2">Emulador OBD2</a></li>
+            <li><a href="#ayuda-gps-neo">Emulador GPS NEO</a></li>
+            <li><a href="#ayuda-routes">Creador de rutas</a></li>
+            <li><a href="#ayuda-hardware">Hardware (Pi 4)</a></li>
+            <li><a href="#ayuda-faq">Solución de problemas</a></li>
+          </ol>
+        </nav>
+        <div class="cards manual-cards">
+          <div class="card manual-diagram-card" id="ayuda-menu">
+            <h3>Dónde está el menú</h3>
+            <p class="kv" style="margin-bottom:0.75rem;">En la <strong>izquierda</strong> de la pantalla (o bajo el botón ☰ en móvil) aparece el menú. Cada enlace lleva a una sección.</p>
+            <figure class="manual-fig">
+              <img src="/imagenes/ayuda-menu-lateral.png" alt="Menú lateral" class="manual-img" loading="lazy">
+              <figcaption>Menú lateral. Pulse <strong>Emulador OBD2</strong> para ver valores, controles, DTC y Crear perfil. Pulse <strong>Emulador GPS NEO</strong> para puerto serial y simulación de posición/ruta.</figcaption>
+            </figure>
+          </div>
+          <div class="card card-highlight" id="ayuda-resumen">
+            <h3>1. Resumen</h3>
+            <p class="kv"><strong>Qué verá:</strong> Tres bloques: Raspberry Pi (nombre WiFi y Bluetooth), estado del Emulador OBD2, estado del Emulador GPS. Abajo, la card <strong>Escenario</strong> con Exportar e Importar.</p>
+            <figure class="manual-fig">
+              <img src="/imagenes/ayuda-resumen-escenario.png" alt="Resumen y Escenario" class="manual-img" loading="lazy">
+              <figcaption>Botones <strong>Exportar escenario</strong> e <strong>Importar escenario</strong> en el bloque inferior.</figcaption>
+            </figure>
+            <h4 class="manual-h4">Exportar / Importar escenario</h4>
+            <p class="kv">Exporte un JSON con el estado actual (OBD, perfil, DTCs, GPS, ruta). Importe ese archivo para restaurarlo.</p>
+          </div>
+          <div class="card" id="ayuda-sistema">
+            <h3>2. Sistema (Pi)</h3>
+            <p class="kv">Red (WiFi y Bluetooth), puertos serial y sección Bluetooth para hacer visible la Pi y emparejar el celular.</p>
+            <figure class="manual-fig">
+              <img src="/imagenes/ayuda-sistema-bt.png" alt="Sistema y Bluetooth" class="manual-img" loading="lazy">
+              <figcaption>Elija adaptador BT y pulse <strong>Arrancar / Hacer visible</strong>.</figcaption>
+            </figure>
+          </div>
+          <div class="card" id="ayuda-obd2">
+            <h3>3. Emulador OBD2</h3>
+            <p class="kv">Varias pestañas: En vivo (cuadro de mandos), Dispositivos, Controles, Crear perfil, DTC/OBD, GPS, Logger, Alertas.</p>
+            <figure class="manual-fig">
+              <img src="/imagenes/ayuda-obd2-pestanas.png" alt="Emulador OBD2 pestañas" class="manual-img" loading="lazy">
+              <figcaption>Barra de pestañas del Emulador OBD2.</figcaption>
+            </figure>
+            <figure class="manual-fig">
+              <img src="/imagenes/ayuda-obd2-en-vivo.png" alt="OBD2 En vivo" class="manual-img" loading="lazy">
+              <figcaption>Pestaña <strong>En vivo</strong>: cuadro de mandos (velocidad, RPM, temperatura, etc.).</figcaption>
+            </figure>
+            <h4 class="manual-h4">Pestaña «Controles»</h4>
+            <figure class="manual-fig">
+              <img src="/imagenes/ayuda-obd2-controles.png" alt="OBD2 Controles" class="manual-img" loading="lazy">
+              <figcaption>Valores manuales, simulador de conducción y simular fallos.</figcaption>
+            </figure>
+            <h4 class="manual-h4">Pestaña «GPS»</h4>
+            <figure class="manual-fig">
+              <img src="/imagenes/ayuda-obd2-gps-botones.png" alt="OBD2 GPS" class="manual-img" loading="lazy">
+              <figcaption>Configure posición/ruta, <strong>Aplicar</strong> e <strong>Iniciar envío por serial</strong>. El puerto se abre en Emulador GPS NEO.</figcaption>
+            </figure>
+          </div>
+          <div class="card" id="ayuda-gps-neo">
+            <h3>4. Emulador GPS NEO</h3>
+            <p class="kv">Abrir/cerrar el puerto serial (UART) por el que se envían tramas NMEA. La configuración de posición y ruta está en la misma página, sección <strong>Posición y envío por serial</strong>.</p>
+            <figure class="manual-fig">
+              <img src="/imagenes/ayuda-gps-neo-abrir-puerto.png" alt="GPS NEO" class="manual-img" loading="lazy">
+              <figcaption>Elija puerto y baud rate, pulse <strong>Abrir puerto</strong>. Luego configure y arranque el envío en OBD2 → GPS.</figcaption>
+            </figure>
+          </div>
+          <div class="card" id="ayuda-routes">
+            <h3>5. Creador de rutas</h3>
+            <p class="kv">Dibuje una ruta en el mapa (inicio, fin, paradas), genere la ruta por carretera y guárdela para usarla en el emulador GPS.</p>
+            <figure class="manual-fig">
+              <img src="/imagenes/ayuda-routes.png" alt="Creador de rutas" class="manual-img" loading="lazy">
+              <figcaption>Inicio / Fin / Parada, <strong>Generar ruta</strong> y <strong>Guardar ruta</strong>. Requiere <code class="code-inline">GOOGLE_MAPS_API_KEY</code>.</figcaption>
+            </figure>
+          </div>
+          <div class="card" id="ayuda-hardware">
+            <h3>6. Hardware (Pi 4)</h3>
+            <p class="kv">Listado de componentes, tablas de conexión (OBD2, MCP2551, GPIO), opciones USB o CAN por SPI, y pasos para subir el bus CAN.</p>
+            <figure class="manual-fig">
+              <img src="/imagenes/ayuda-hardware.png" alt="Hardware Pi 4" class="manual-img" loading="lazy">
+              <figcaption>Componentes, conector OBD2, pines GPIO y scripts can0.</figcaption>
+            </figure>
+          </div>
+          <div class="card" id="ayuda-faq">
+            <h3>7. Solución de problemas</h3>
+            <dl class="help-faq">
+              <dt>No aparece «Conectado al emulador OBD2»</dt>
+              <dd>Compruebe que el servidor esté en marcha y que entre con la IP correcta y puerto 3000. Recargue (F5).</dd>
+              <dt>Torque (o la app) no conecta por WiFi</dt>
+              <dd>Use la <strong>IP de la Pi</strong> y puerto <strong>35000</strong>. Celular y Pi en la misma red WiFi.</dd>
+              <dt>Bluetooth: error al emparejar</dt>
+              <dd>En la Pi instale <code class="code-inline">python3-dbus</code> y <code class="code-inline">python3-gi</code>. En Sistema pulse «Ver log del agente».</dd>
+              <dt>El GPS no envía datos</dt>
+              <dd>1) Abra el puerto en <strong>Emulador GPS NEO</strong>. 2) En <strong>OBD2 → GPS</strong> pulse <strong>Aplicar</strong> e <strong>Iniciar envío por serial</strong>. 3) UART habilitado en raspi-config, consola serial desactivada.</dd>
+              <dt>El mapa no carga o sale «Esta página no puede cargar Google Maps correctamente»</dt>
+              <dd>1) Tenga <code class="code-inline">GOOGLE_MAPS_API_KEY</code> en <code class="code-inline">.env</code>. 2) En <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Google Cloud Console → Credentials</a> pulse su clave API → <strong>Restricciones de aplicación</strong>: si usa «Referentes HTTP», añada <code class="code-inline">http://192.168.0.64:3000/*</code> y <code class="code-inline">http://localhost:3000/*</code> (o la IP/puerto desde la que abre el dashboard). 3) En <strong>Restricciones de API</strong> permita «Maps JavaScript API» y «Directions API» (o «No restringir clave» para pruebas). 4) El proyecto debe tener facturación habilitada (Google da crédito gratuito).</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div id="page-import-torque" class="page">
+        <h2>Importar exportación de Torque Pro</h2>
+        <p class="kv" style="margin-bottom:1rem;">Sube el archivo ZIP que exportaste desde Torque (Trip Logs Export). Se mostrará un listado por carpetas para que elijas qué partes importar.</p>
+        <div class="cards">
+          <div class="card card-help">
+            <h3>¿Para qué sirve cada tipo de archivo?</h3>
+            <p class="kv card-hint">En el ZIP de Torque suelen venir dos subcarpetas y archivos con estos formatos:</p>
+            <dl class="torque-file-types">
+              <dt><strong>.csv</strong></dt>
+              <dd>Registros de viaje (trip logs): cada fila es un instante con tiempo, velocidad (OBD), RPM, temperatura, <strong>latitud, longitud</strong>, altitud GPS, etc. Sirven para reproducir el trayecto en el emulador, extraer rutas o analizar datos.</dd>
+              <dt><strong>.log</strong></dt>
+              <dd>Log en bruto del viaje (a veces el mismo contenido que el CSV con otro nombre, o formato interno de Torque). Útil como respaldo o para herramientas que lean ese formato.</dd>
+              <dt><strong>Subcarpetas (p. ej. por fecha o por viaje)</strong></dt>
+              <dd>Torque puede agrupar los archivos en carpetas (por día, por sesión, etc.). Puedes importar una carpeta entera o solo los archivos que te interesen.</dd>
+            </dl>
+            <p class="kv" style="margin-top:0.75rem;font-size:0.9rem;">Todo lo que importes se guarda en <code class="code-inline">app/data/torque-logs/</code>. Esos CSV se usan en el <strong>Logger del Emulador OBD2</strong> (reproducción con sensores). El <strong>Creador de rutas</strong> usa sus propias rutas guardadas (solo puntos lat/lon); hoy no asigna datos de sensores por punto — eso queda en los logs de Torque para el Logger.</p>
+          </div>
+          <div class="card">
+            <h3>1. Seleccionar ZIP</h3>
+            <input type="file" id="torque-zip-input" accept=".zip" class="input-file">
+          </div>
+          <div class="card torque-preview-card torque-preview-card--with-map" id="torque-preview-card" style="display:none;">
+            <div class="torque-preview-inner-panel">
+              <h3>2. Vista previa — elige qué importar</h3>
+              <p class="kv card-hint">Solo se listan archivos <strong>.csv</strong> útiles. Marca lo que quieras importar y pulsa «Importar selección». Se guardan en <code class="code-inline">app/data/torque-logs/</code>.</p>
+              <p class="kv torque-import-hint">Si los CSV tienen lat/lon, al importar se crean <strong>rutas guardadas</strong> con todos los puntos y sensores (incl. velocidad). Esas rutas aparecen en el Creador de rutas y en el simulador GPS; la velocidad por punto se usa en el GPS. Los CSV se guardan en <code>torque-logs</code> para el Logger OBD2.</p>
+              <div class="torque-filters">
+                <h4 class="torque-filters-title">Filtros (ocultar logs basura)</h4>
+                <div class="torque-filters-row">
+                  <label class="torque-filter-label">Duración mín. (min): <input type="number" id="torque-filter-min-duration" class="torque-filter-input" min="0" step="0.5" value="0"></label>
+                  <label class="torque-filter-label">Distancia mín. (km): <input type="number" id="torque-filter-min-distance" class="torque-filter-input" min="0" step="0.1" value="0"></label>
+                  <label class="torque-filter-label">Desde: <input type="date" id="torque-filter-date-from" class="torque-filter-input torque-filter-date"></label>
+                  <label class="torque-filter-label">Hasta: <input type="date" id="torque-filter-date-to" class="torque-filter-input torque-filter-date"></label>
+                </div>
+                <label class="torque-filter-label torque-filter-checkbox"><input type="checkbox" id="torque-filter-only-gps"> Solo con GPS (lat/lon)</label>
+              </div>
+              <div id="torque-preview-tree" class="torque-preview-tree"></div>
+              <div class="torque-import-actions">
+                <button type="button" class="btn btn-primary" id="torque-import-btn" disabled><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-download"/></svg><span id="torque-import-btn-label">Importar selección</span></button>
+                <span id="torque-import-status" class="torque-import-status"></span>
+              </div>
+            </div>
+            <div class="torque-preview-right">
+              <div id="torque-preview-map-wrap" class="torque-preview-map-wrap"></div>
+              <div class="card torque-detail-card torque-detail-card--with-layout" id="torque-detail-panel" style="display:none;">
+                <div id="torque-detail-map-wrap" class="torque-detail-map-wrap" aria-hidden="true"></div>
+                <div class="torque-detail-map-actions" id="torque-detail-map-actions" style="display:none;">
+                  <button type="button" class="btn torque-detail-ver-datos" id="torque-detail-ver-datos">Ver datos</button>
+                </div>
+                <div class="torque-detail-popup-backdrop" id="torque-detail-popup-backdrop" style="display:none;" aria-hidden="true">
+                  <div class="torque-detail-inner-panel torque-detail-popup-box" id="torque-detail-inner-panel">
+                    <div class="torque-detail-header">
+                      <h4 id="torque-detail-title" class="torque-detail-title">Vista previa detallada</h4>
+                      <button type="button" class="btn btn-ghost torque-detail-close" id="torque-detail-close" aria-label="Cerrar">Cerrar</button>
+                    </div>
+                    <div id="torque-detail-content" class="torque-detail-content"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div id="img-modal-overlay" class="img-modal-overlay" aria-hidden="true" role="dialog" aria-label="Imagen ampliada">
+    <button type="button" class="img-modal-close" aria-label="Cerrar"><svg class="icon icon--lg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close"/></svg></button>
+    <img id="img-modal-img" src="" alt="" class="img-modal-img"/>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous"></script>
+  <script type="module" src="/js/main.js?v=2.2.0"></script>
+</body>
+</html>

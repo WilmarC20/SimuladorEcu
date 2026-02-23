@@ -1,0 +1,16 @@
+# No subir claves ni datos locales
+.env
+.env.local
+.env.*.local
+
+# Dependencias
+node_modules/
+app/node_modules/
+
+# Carpeta Tracker360 (proyecto Arduino aparte)
+Tracker360/
+
+# Logs y caché
+*.log
+.npm
+.cache

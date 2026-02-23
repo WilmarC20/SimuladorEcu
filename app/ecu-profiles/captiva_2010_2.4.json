@@ -1,0 +1,48 @@
+{
+  "vehicleName": "Chevrolet Captiva Sport 2.4 2010",
+  "protocol": "ISO15765-4_CAN_11BIT_500K",
+  "requestId": "0x7DF",
+  "responseId": "0x7E8",
+  "pids": [
+    {
+      "id": "04",
+      "name": "EngineLoad",
+      "bytes": 1,
+      "encode": "Math.round(value*255/100)",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "id": "05",
+      "name": "CoolantTemp",
+      "bytes": 1,
+      "encode": "value+40",
+      "min": -40,
+      "max": 215
+    },
+    {
+      "id": "0C",
+      "name": "EngineRPM",
+      "bytes": 2,
+      "encode": "Math.round(value*4)",
+      "min": 0,
+      "max": 16383
+    },
+    {
+      "id": "0D",
+      "name": "VehicleSpeed",
+      "bytes": 1,
+      "encode": "value",
+      "min": 0,
+      "max": 255
+    },
+    {
+      "id": "2F",
+      "name": "FuelLevel",
+      "bytes": 1,
+      "encode": "Math.round(value*255/100)",
+      "min": 0,
+      "max": 100
+    }
+  ]
+}

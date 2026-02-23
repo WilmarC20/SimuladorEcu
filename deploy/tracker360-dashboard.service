@@ -1,0 +1,26 @@
+[Unit]
+Description=Dashboard OBD2 + GPS (Tracker360 emulator)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=wilmarc
+WorkingDirectory=/home/wilmarc/dashboard/app
+
+# Subir can0 antes de arrancar la app (espera hasta 20s a que exista el MCP2515)
+ExecStartPre=+/home/wilmarc/dashboard/scripts/ensure-can0-boot.sh 20 500000
+
+# Ruta de node: usa 'which node' si falla y ponla aquí
+ExecStart=/usr/bin/node index.js
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Variables opcionales (descomenta si usas dongle BT o quieres desactivar respondedor CAN)
+# Environment=OBD_BT_HCI=hci1
+# Environment=OBD_CAN_RESPONDER=0
+
+[Install]
+WantedBy=multi-user.target
