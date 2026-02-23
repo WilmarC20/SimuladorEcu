@@ -17,7 +17,7 @@ function isTouchDevice() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
 
-function initCursorForKiosk() {
+function initKioskMode() {
   if (isTouchDevice()) {
     document.documentElement.classList.add('touch-device');
     document.body.classList.add('touch-device');
@@ -201,7 +201,7 @@ function initImgModal() {
 }
 
 function init() {
-  initCursorForKiosk();
+  initKioskMode();
   const verEl = document.getElementById('version-badge');
   if (verEl) verEl.textContent = 'v' + UI_VERSION;
   initMenu();

@@ -1,6 +1,6 @@
 # Simulador ECU / OBD2 + GPS — Lo que está implementado (detalle)
 
-Documento para explicar a otra IA (p. ej. ChatGPT) qué tiene este proyecto. **Stack:** Node.js (Express), frontend SPA en un solo HTML + JS modular, pensado para correr en Raspberry Pi 4.
+Documento de referencia del proyecto. **Stack:** Node.js (Express), frontend SPA en un solo HTML + JS modular, pensado para correr en Raspberry Pi 4.
 
 ---
 

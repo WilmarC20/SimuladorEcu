@@ -4,7 +4,7 @@ Documento para quien tiene un proyecto (p. ej. Arduino) que se conecta a una ECU
 
 ---
 
-## PROMPT (copiar al otro Cursor)
+## Texto de referencia (protocolo OBD2)
 
 ```
 Tu proyecto se conecta a una ECU OBD2 por ELM327 (Bluetooth o serial). La ECU responde en estándar OBD-II modo 01 (datos en tiempo real). Esto describe cómo PEDIR cada sensor y cómo INTERPRETAR la respuesta (qué bytes llegan y qué valor real representan).

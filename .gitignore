@@ -7,8 +7,9 @@
 node_modules/
 app/node_modules/
 
-# Carpeta Tracker360 (proyecto Arduino aparte)
+# Carpeta Tracker360 (proyecto Arduino aparte — no subir)
 Tracker360/
+/Tracker360
 
 # Logs y caché
 *.log
