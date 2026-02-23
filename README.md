@@ -180,7 +180,6 @@ Copia `.env.example` a `.env` y no subas `.env` al repositorio.
 │   ├── routes/             # Rutas API (/api/*)
 │   ├── ecu-profiles/       # Perfiles de vehículo (JSON)
 │   └── data/               # Rutas guardadas (routes.json)
-├── docs/                   # Documentación hardware (Pi, CAN, OBD2)
 ├── scripts/                # Scripts CAN (can0-up, ensure-can0-boot)
 ├── deploy/                 # Servicio systemd de ejemplo
 └── .env.example            # Plantilla de variables de entorno
@@ -190,8 +189,16 @@ La carpeta **Tracker360** (firmware u otro código externo) no forma parte de es
 
 ---
 
+## Uso y licencia
+
+He decidido dejar **este proyecto** disponible para **uso libre con fines educativos y personales**. Puedes usarlo, estudiarlo y modificarlo en ese ámbito.
+
+**No está permitido** el uso **empresarial** ni con **fines de lucro** sin autorización previa. Para uso comercial o en flotas/empresas, contacta con el autor.
+
+---
+
 ## Repositorio
 
 **[GitHub — WilmarC20/SimuladorEcu](https://github.com/WilmarC20/SimuladorEcu)**
 
-Proyecto de código abierto. Para reportar fallos o contribuir, usa los *issues* y *pull requests* del repositorio.
+Para reportar fallos o contribuir, usa los *issues* y *pull requests* del repositorio.
