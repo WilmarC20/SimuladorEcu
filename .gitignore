@@ -11,6 +11,13 @@ app/node_modules/
 Tracker360/
 /Tracker360
 
+# Documentación y archivos internos (no necesarios para funcionamiento)
+comandos.txt
+IMPLEMENTADO.md
+PUSH_A_GITLAB.md
+gpsWaze/
+docs/
+
 # Logs y caché
 *.log
 .npm
