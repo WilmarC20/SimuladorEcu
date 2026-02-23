@@ -1,7 +1,7 @@
 # 🚗 Simulador ECU — OBD2 + GPS NEO
 
 > **Una Raspberry Pi que emula la ECU de un vehículo y un GPS NEO.**  
-> Dashboard web para gestionar **perfiles de vehículo**, **códigos de falla (DTC)**, sensores en vivo, rutas y NMEA por UART. Conecta Torque u otra app OBD2 por WiFi, Bluetooth o CAN.
+> Dashboard web para gestionar **perfiles de vehículo**, **códigos de falla (DTC)**, sensores en vivo, rutas y NMEA por UART. **Importa datos desde Torque Pro** (Trip Logs) y úsalos como rutas con sensores. Conecta Torque u otra app OBD2 por WiFi, Bluetooth o CAN.
 
 [![Raspberry Pi 4](https://img.shields.io/badge/Raspberry%20Pi%204-OK-green)](#plataforma) [![Pi Zero](https://img.shields.io/badge/Pi%20Zero%20%2F%202%20W-Soportado-orange)](#plataforma) [![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-brightgreen)](#requisitos)
 
@@ -45,6 +45,13 @@ Este proyecto no es solo un “puerto OBD2 virtual”: es un **sistema completo*
 
 - **Mapa (Google Maps)** para marcar inicio, fin y paradas; **Generar ruta** por carretera (Directions API) y **Guardar ruta**. Las rutas se cargan en el emulador GPS para reproducir el trayecto.
 
+### Importar datos desde Torque Pro
+
+- **Importar exportación de Torque (Trip Logs Export):** subes el ZIP que exportas desde **Torque Pro** en el móvil. El dashboard muestra un listado por carpetas de los archivos **CSV** (trip logs): tiempo, velocidad, RPM, temperatura, **latitud, longitud**, altitud GPS, etc.
+- **Vista previa y filtros:** duración mínima, distancia mínima, rango de fechas, “solo con GPS”. Marcas qué archivos o carpetas importar y pulsas **Importar selección**. Los CSV se guardan en `app/data/torque-logs/`.
+- **Rutas guardadas con sensores:** si los CSV tienen lat/lon, al importar se crean **rutas guardadas** con todos los puntos y datos de sensores (incl. velocidad por punto). Esas rutas aparecen en el **Creador de rutas** y en el **emulador GPS** (la velocidad por punto se usa en la reproducción). Los mismos CSV se usan en el **Logger del Emulador OBD2** para reproducir el trayecto con sensores en vivo.
+- **Vista detallada:** por cada archivo puedes abrir una vista previa con mapa del recorrido, tabla de waypoints, columnas de sensores y reproducción (playback) del viaje.
+
 ### Dashboard y escenario
 
 - **Resumen** del sistema (red, Bluetooth, estado OBD2 y GPS). **Exportar / Importar escenario**: un solo JSON con el estado completo (valores del motor, perfil activo, DTC, configuración GPS, ruta, etc.) para repetir pruebas o compartir configuraciones.
@@ -60,6 +67,7 @@ Este proyecto no es solo un “puerto OBD2 virtual”: es un **sistema completo*
 | **Desarrollar o probar apps OBD2** (Torque, etc.) | Conectas por WiFi/BT/CAN; cambias perfiles, DTC y sensores en vivo sin tocar un auto. |
 | **Probar dispositivos o gateways** | La Pi responde como una ECU real (PIDs, DTC, freeze frame, VIN). |
 | **Simular viajes con GPS** | Dibujas la ruta en el mapa, la reproduces por UART para navegadores o dispositivos que lean NMEA. |
+| **Reutilizar viajes reales (Torque)** | Exportas los Trip Logs desde Torque Pro (ZIP), los importas en el dashboard y obtienes rutas guardadas + datos OBD por punto para el GPS y el Logger OBD2. |
 | **Enseñar o hacer demos** | Exportas un escenario (fallas, ruta, velocidad) y lo importas en otro momento. |
 
 Todo se controla desde **una sola interfaz web** en tu red (PC, tablet o móvil).
@@ -101,6 +109,10 @@ Puerto serial, baud rate, **Abrir puerto**. Configuración de posición/ruta y *
 Inicio, fin, paradas en el mapa; **Generar ruta** y **Guardar ruta** para usarla en el emulador GPS. Requiere `GOOGLE_MAPS_API_KEY` en `.env`.
 
 ![Creador de rutas](app/public/imagenes/ayuda-routes.png)
+
+### Importar Torque Pro
+
+Menú **Importar Torque**: subes el ZIP de la exportación **Trip Logs** de Torque Pro. Listado por carpetas (solo CSV útiles), filtros por duración, distancia y fechas. Marcas lo que quieres importar; se guardan en `app/data/torque-logs/` y, si tienen lat/lon, se crean rutas guardadas con sensores para el GPS y el Logger OBD2. Vista detallada con mapa del recorrido y datos por punto.
 
 ### Hardware (Pi 4)
 
